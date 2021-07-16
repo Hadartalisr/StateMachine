@@ -18,7 +18,6 @@ class MainClassTest {
 		states.add(new StateA());
 		states.add(new StateB());
 		MachineA machineA = new MachineA(states, 0);
-
 		///////////////////////
 		
 		

@@ -1,7 +1,6 @@
 package code.models;
 
 import java.util.List;
-import code.interfaces.Machine;
 import code.interfaces.State;
 
 public class MachineA {
@@ -15,6 +14,7 @@ public class MachineA {
 		this.states = states;
 		this.currentState = states.get(startStateIndex);
 		this.isRunning = true;
+		System.out.println(this);
 		this.printCurrentState();
 	}
 
@@ -23,10 +23,19 @@ public class MachineA {
 		this.currentState = this.getStateByClass(nextStateClass);
 		this.printCurrentState();
 	}
-	
+
 	public String toString() {
-		String statesString = String.join("\n", this.states.stream().map(State::toString).toList());
-		return String.format("[\n %s \n]", statesString);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (int i = 0; i < this.states.size(); i++) {
+			String stateString = this.states.get(i).getClass().getSimpleName();
+			String possibleStates = String.format(" -> [%s]\n", getpossibleStatesString(this.states.get(i)));
+			stringBuilder.append(stateString).append(possibleStates);
+		}
+		return stringBuilder.toString();
+	}
+
+	public void printCurrentState() {
+		System.out.println(String.format("Current state: %s.", currentState.getClass().getSimpleName()));
 	}
 
 	private State getStateByClass(Class<? extends State> stateClass) {
@@ -35,18 +44,17 @@ public class MachineA {
 				return state;
 			}
 		}
-		String errorString = String.format("ERROR - %s's calculation method returned a class which was not included at the getAllPossibleCalculations", stateClass.toString());
+		String errorString = String.format(
+				"ERROR - %s's calculation method returned a class which was not included at the getAllPossibleCalculations",
+				stateClass.toString());
 		throw new RuntimeException(errorString);
 	}
-	
-	private void printCurrentState() {
-		System.out.println(String.format("Current state: %s.", currentState.getClass().getSimpleName()));
-	}
-
-
-	// nice to have a matrix to string
 
 	// static methods
+
+	private static String getpossibleStatesString(State state) {
+		return String.join(", ", state.getAllPossibleCalculations().stream().map(Class::getSimpleName).toList());
+	}
 
 	private static void validateMachineInput(List<State> states, int startStateIndex) {
 		if (states == null || states.size() == 0) {
