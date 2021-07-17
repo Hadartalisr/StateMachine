@@ -3,7 +3,7 @@ package code;
 import java.util.ArrayList;
 import java.util.List;
 
-import code.interfaces.State;
+import code.abstracts.State;
 
 public class StateB extends State{
 
@@ -11,16 +11,16 @@ public class StateB extends State{
 
 	public StateB() {
 		this.allPossibleCalculations = new ArrayList<>();
-		this.allPossibleCalculations.add(StateA.class);
-		this.allPossibleCalculations.add(StateB.class);
+		this.allPossibleCalculations.add(StateA.class); // 0
+		this.allPossibleCalculations.add(StateB.class); // 1
 	}
 	
 	@Override
-	public Class<? extends State> calculate(Object event) {
-		if(event instanceof String && event.equals("b")) {
-			return StateB.class;
+	public int calculate(Object event) {
+		if(event instanceof String && event.equals("a")) {
+			return 0;
 		}
-		return StateA.class;
+		return 1;
 	}
 
 	@Override

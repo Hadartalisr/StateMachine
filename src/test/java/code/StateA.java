@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.assertj.core.util.Arrays;
 
-import code.interfaces.State;
+import code.abstracts.State;
 
 public class StateA extends State {
 
@@ -13,16 +13,16 @@ public class StateA extends State {
 
 	public StateA() {
 		this.allPossibleCalculations = new ArrayList<>();
-		this.allPossibleCalculations.add(StateA.class);
-		this.allPossibleCalculations.add(StateB.class);
+		this.allPossibleCalculations.add(StateA.class); // 0
+		this.allPossibleCalculations.add(StateB.class); // 1
 	}
 	
 	@Override
-	public Class<? extends State> calculate(Object event) {
+	public int calculate(Object event) {
 		if(event instanceof String && event.equals("b")) {
-			return StateB.class;
+			return 1;
 		}
-		return StateA.class;
+		return 0;
 	}
 
 	@Override

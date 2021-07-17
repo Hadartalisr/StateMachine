@@ -7,28 +7,29 @@ import java.util.Scanner;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import code.interfaces.State;
-import code.models.MachineA;
+import code.abstracts.State;
+import code.models.Machine;
 
 @SpringBootTest
 class MainClassTest {
 
+	private static final String ENTER_EVENT_STRING = "Enter event :";
+	
 	public static void main(String[] args) {
 		List<State> states = new ArrayList<>();
 		states.add(new StateA());
 		states.add(new StateB());
-		MachineA machineA = new MachineA(states, 0);
+		Machine machineA = new Machine(states, 0);
 		///////////////////////
-		
-		
-		Scanner sc = new Scanner(System.in);
 
-		while (sc.hasNext() == true) {
-			System.out.println("Enter event:");
-			String s1 = sc.next();
-			machineA.process(s1);
-			System.out.println();
-		}
+		Scanner scanner = new Scanner(System.in);
+		System.out.println(ENTER_EVENT_STRING);
+		while (scanner.hasNext() == true){
+			String input = scanner.next();
+			machineA.process(input);
+			System.out.println(ENTER_EVENT_STRING);
+		};
+		scanner.close();
 	}
 
 }
