@@ -6,7 +6,6 @@ import java.util.Scanner;
 
 import code.abstracts.Event;
 import code.abstracts.State;
-import code.models.Machine;
 
 class MainClassTest {
 
@@ -18,13 +17,17 @@ class MainClassTest {
 		for(int i = 0; i < 5; i++) {
 			intEvents.add(new Event<Integer>(i));
 		}
-		List<Event<Integer>> strEvents = new ArrayList<Event<Integer>>(); 
+		List<Event<String>> strEvents = new ArrayList<Event<String>>(); 
 		for(int i = 0; i < 5; i++) {
-			strEvents.add(new Event<Integer>(i));
+			strEvents.add(new Event<String>((char)(i+40)+""));
 		}
 		for(int i = 0; i < 5; i++) {
 			long id = intEvents.get(i).getID();
-			System.out.println(intEvents.get(i).getEventType() + " " + id);
+			System.out.println("id: " + id + ", eventType: " + intEvents.get(i).getEventType() + " ,data: " + intEvents.get(i).getEventData());
+		}
+		for(int i = 0; i < 5; i++) {
+			long id = strEvents.get(i).getID();
+			System.out.println("id: " + id + ", eventType: " + strEvents.get(i).getEventType() + " ,data: " + strEvents.get(i).getEventData());
 		}
 		System.out.println();
 	}

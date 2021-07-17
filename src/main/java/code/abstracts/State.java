@@ -20,5 +20,8 @@ public abstract class State {
 	 */
 	public abstract List<Class<? extends State>> getAllPossibleCalculations();
 	
+	@Override
+	public abstract String toString();
+	
 
 }

@@ -1,13 +1,15 @@
 package code.models;
 
 import java.util.List;
+
+import code.abstracts.Event;
+import code.abstracts.Machine;
 import code.abstracts.State;
 import code.models.MachineProcessResponse.Status;
 
-public class Machine {
+class MachineA implements Machine{
 
 	private State currentState;
-
 	private List<State> states; // all of all the machine's states
 	private boolean isRunning = false; // indicates if the machine is running
 
@@ -18,23 +20,30 @@ public class Machine {
 	 * @param states
 	 * @param startStateIndex
 	 */
-	public Machine(List<State> states, int startStateIndex) {
-		Machine.validateMachineInput(states, startStateIndex);
+	public MachineA(List<State> states, int startStateIndex) {
+		MachineA.validateMachineInput(states, startStateIndex);
 		this.states = states;
 		this.currentState = states.get(startStateIndex);
 		System.out.println(this);
-		this.printCurrentState();
 	}
 
+	@Override
 	public void start() {
 		this.isRunning = true;
 	}
 
+	@Override
 	public void stop() {
 		this.isRunning = false;
 	}
+	
+	@Override
+	public State getCurrentState() {
+		return this.currentState;
+	}
 
-	public MachineProcessResponse process(Object event) {
+	@Override
+	public MachineProcessResponse process(Event<?> event) {
 		MachineProcessResponse.Status status = Status.OK;
 		String message = null;
 		if (this.isRunning) { // if the machine is running we should process the event
@@ -51,6 +60,19 @@ public class Machine {
 		}
 		return new MachineProcessResponse(status, message, this.currentState);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (int i = 0; i < this.states.size(); i++) {
+			String stateString = this.states.get(i).getClass().getSimpleName();
+			String possibleStates = String.format(" -> [%s]\n", getpossibleStatesString(this.states.get(i)));
+			stringBuilder.append(stateString).append(possibleStates);
+		}
+		return stringBuilder.toString();
+	}
+	
+
 
 	private void updateState(Class<? extends State> nextStateClass) {
 		if (!nextStateClass.equals(this.currentState.getClass())) {
@@ -71,21 +93,7 @@ public class Machine {
 		throw new RuntimeException(errorString);
 	}
 
-	public String toString() {
-		StringBuilder stringBuilder = new StringBuilder();
-		for (int i = 0; i < this.states.size(); i++) {
-			String stateString = this.states.get(i).getClass().getSimpleName();
-			String possibleStates = String.format(" -> [%s]\n", getpossibleStatesString(this.states.get(i)));
-			stringBuilder.append(stateString).append(possibleStates);
-		}
-		return stringBuilder.toString();
-	}
 
-	public void printCurrentState() {
-		String decorator = String.format("\n%s\n", "*".repeat(100));
-		String currentStateStr = String.format("Current state: %s.", currentState.getClass().getSimpleName());
-		System.out.println(decorator + currentStateStr + decorator);
-	}
 
 	// static methods
 

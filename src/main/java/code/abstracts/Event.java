@@ -1,6 +1,5 @@
 package code.abstracts;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
