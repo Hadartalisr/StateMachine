@@ -1,20 +1,21 @@
-package code.models;
+package machine.factory;
 
 import java.util.List;
 
-import code.abstracts.Event;
-import code.abstracts.Machine;
-import code.abstracts.State;
-import code.models.MachineProcessResponse.Status;
+import machine.models.Event;
+import machine.models.Machine;
+import machine.models.MachineProcessResponse;
+import machine.models.State;
+import machine.models.Status;
 
-class MachineA implements Machine{
+class MachineA implements Machine {
 
 	private State currentState;
 	private List<State> states; // all of all the machine's states
 	private boolean isRunning = false; // indicates if the machine is running
 
 	/**
-	 * The method construct a new machine. The machine is yet not running (use
+	 * The method construct a new machine. The machine is not yet running (use
 	 * {@link #start()} and {@link #stop()} methods) .
 	 * 
 	 * @param states
@@ -36,7 +37,7 @@ class MachineA implements Machine{
 	public void stop() {
 		this.isRunning = false;
 	}
-	
+
 	@Override
 	public State getCurrentState() {
 		return this.currentState;
@@ -44,7 +45,7 @@ class MachineA implements Machine{
 
 	@Override
 	public MachineProcessResponse process(Event<?> event) {
-		MachineProcessResponse.Status status = Status.OK;
+		Status status = Status.OK;
 		String message = null;
 		if (this.isRunning) { // if the machine is running we should process the event
 			int index = this.currentState.calculate(event);
@@ -60,7 +61,7 @@ class MachineA implements Machine{
 		}
 		return new MachineProcessResponse(status, message, this.currentState);
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
@@ -71,8 +72,6 @@ class MachineA implements Machine{
 		}
 		return stringBuilder.toString();
 	}
-	
-
 
 	private void updateState(Class<? extends State> nextStateClass) {
 		if (!nextStateClass.equals(this.currentState.getClass())) {
@@ -92,8 +91,6 @@ class MachineA implements Machine{
 				stateClass.toString());
 		throw new RuntimeException(errorString);
 	}
-
-
 
 	// static methods
 

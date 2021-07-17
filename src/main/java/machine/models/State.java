@@ -1,4 +1,4 @@
-package code.abstracts;
+package machine.models;
 
 import java.util.List;
 

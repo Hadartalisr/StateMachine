@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import code.abstracts.Event;
-import code.abstracts.State;
+import machine.models.Event;
+import machine.models.State;
 
 class MainClassTest {
 

@@ -1,6 +1,4 @@
-package code.abstracts;
-
-import code.models.MachineProcessResponse;
+package machine.models;
 
 public interface Machine {
 	

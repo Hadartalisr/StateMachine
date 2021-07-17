@@ -1,6 +1,4 @@
-package code.models;
-
-import code.abstracts.State;
+package machine.models;
 
 public class MachineProcessResponse {
 
@@ -26,10 +24,6 @@ public class MachineProcessResponse {
 
 	public State getCurrentState() {
 		return currentState;
-	}
-
-	public enum Status {
-		OK, ERROR
 	}
 
 }
