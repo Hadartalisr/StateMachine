@@ -4,7 +4,8 @@ import java.util.List;
 
 public abstract class State {
 	
-
+	public final String name = this.getClass().getSimpleName();
+	
 	/**
 	 * The method calculates the state that the machine should be switched into.
 	 * 

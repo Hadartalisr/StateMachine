@@ -39,6 +39,11 @@ class MachineA implements Machine {
 	}
 
 	@Override
+	public Boolean isRunning() {
+		return this.isRunning;
+	}
+	
+	@Override
 	public State getCurrentState() {
 		return this.currentState;
 	}
