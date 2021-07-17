@@ -32,11 +32,4 @@ public class Event<T>{
 	}
 	
 
-//	
-//	public Integer getID(); // each event should have his own ID
-//	
-//	public Integer getTypeID(); // each event should have a type 
-//	
-//	public T getData(); // the actual data which is within the event 
-
 }

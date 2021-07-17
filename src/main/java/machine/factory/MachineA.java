@@ -49,11 +49,13 @@ class MachineA implements Machine {
 		String message = null;
 		if (this.isRunning) { // if the machine is running we should process the event
 			int index = this.currentState.calculate(event);
-			try {
-				Class<? extends State> nextStateClass = this.currentState.getAllPossibleCalculations().get(index);
-				this.updateState(nextStateClass);
-			} catch (Exception e) { // if (index < 0) or (index > currentState.getAllPossibleCalculations().size())
-				message = e.getMessage();
+			if (index != Integer.MAX_VALUE) { // if the machine change its state
+				try {
+					Class<? extends State> nextStateClass = this.currentState.getAllPossibleCalculations().get(index);
+					this.updateState(nextStateClass);
+				} catch (Exception e) { // if (index < 0) or (index > currentState.getAllPossibleCalculations().size())
+					message = e.getMessage();
+				}
 			}
 		} else { // if the machine is not running
 			status = Status.ERROR;
@@ -116,6 +118,8 @@ class MachineA implements Machine {
 			throw new RuntimeException("ERROR - There must be at least one state in the machine.");
 		}
 		// TODO insert validation that i have in memory all the possible states
+		// TODO insert validation that there all the states done have themselves in the
+		// possible states list
 	}
 
 }
