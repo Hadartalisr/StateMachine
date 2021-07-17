@@ -3,29 +3,30 @@ package code;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import code.abstracts.Event;
 import code.abstracts.State;
 import code.models.Machine;
 
 class MainClassTest {
 
-	private static final String ENTER_EVENT_STRING = "Enter event :";
+//	private static final String ENTER_EVENT_STRING = "Enter event :";
 
 	public static void main(String[] args) {
-		List<State> states = new ArrayList<>();
-		states.add(new StateA());
-		states.add(new StateB());
-		Machine machineA = new Machine(states, 0);
-		///////////////////////
-
-		Scanner scanner = new Scanner(System.in);
-		System.out.println(ENTER_EVENT_STRING);
-		while (scanner.hasNext() == true) {
-			String input = scanner.next();
-			machineA.process(input);
-			System.out.println(ENTER_EVENT_STRING);
+		System.out.println("here");
+		List<Event<Integer>> intEvents = new ArrayList<Event<Integer>>(); 
+		for(int i = 0; i < 5; i++) {
+			intEvents.add(new Event<Integer>(i));
 		}
-		;
-		scanner.close();
+		List<Event<Integer>> strEvents = new ArrayList<Event<Integer>>(); 
+		for(int i = 0; i < 5; i++) {
+			strEvents.add(new Event<Integer>(i));
+		}
+		for(int i = 0; i < 5; i++) {
+			long id = intEvents.get(i).getID();
+			System.out.println(intEvents.get(i).getEventType() + " " + id);
+		}
+		System.out.println();
 	}
 
 }
