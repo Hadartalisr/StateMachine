@@ -54,6 +54,7 @@ class MachineA implements Machine {
 					Class<? extends State> nextStateClass = this.currentState.getAllPossibleCalculations().get(index);
 					this.updateState(nextStateClass);
 				} catch (Exception e) { // if (index < 0) or (index > currentState.getAllPossibleCalculations().size())
+					// TODO implement what the machine should do in such case
 					message = e.getMessage();
 				}
 			}
