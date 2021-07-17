@@ -19,5 +19,6 @@ public abstract class State {
 	 *         switched into
 	 */
 	public abstract List<Class<? extends State>> getAllPossibleCalculations();
+	
 
 }

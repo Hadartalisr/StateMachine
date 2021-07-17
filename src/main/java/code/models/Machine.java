@@ -1,17 +1,13 @@
 package code.models;
 
-import java.awt.Color;
 import java.util.List;
-import java.util.Random;
-
 import code.abstracts.State;
 import code.models.MachineProcessResponse.Status;
-import code.utils.ConsoleColors;
 
 public class Machine {
 
 	private State currentState;
-	private String currentColor = ConsoleColors.getRandomColor();
+
 	private List<State> states; // all of all the machine's states
 	private boolean isRunning = false; // indicates if the machine is running
 
@@ -49,17 +45,16 @@ public class Machine {
 			} catch (Exception e) { // if (index < 0) or (index > currentState.getAllPossibleCalculations().size())
 				message = e.getMessage();
 			}
-		}
-		else { // if the machine is not running
+		} else { // if the machine is not running
 			status = Status.ERROR;
 			message = "ERROR - the machine is in STOP mode.";
 		}
-		return new MachineProcessResponse(status, message);
+		return new MachineProcessResponse(status, message, this.currentState);
 	}
 
 	private void updateState(Class<? extends State> nextStateClass) {
 		if (!nextStateClass.equals(this.currentState.getClass())) {
-			this.currentColor = ConsoleColors.getRandomColor(this.currentColor);
+//			this.currentColor = ConsoleColors.getRandomColor(this.currentColor);
 			this.currentState = this.getStateByClass(nextStateClass);
 		}
 	}
@@ -89,7 +84,7 @@ public class Machine {
 	public void printCurrentState() {
 		String decorator = String.format("\n%s\n", "*".repeat(100));
 		String currentStateStr = String.format("Current state: %s.", currentState.getClass().getSimpleName());
-		System.out.println(currentColor + decorator + currentStateStr + decorator + ConsoleColors.RESET);
+		System.out.println(decorator + currentStateStr + decorator);
 	}
 
 	// static methods
