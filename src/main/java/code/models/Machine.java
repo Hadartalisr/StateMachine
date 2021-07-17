@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import code.abstracts.State;
+import code.models.MachineProcessResponse.Status;
 import code.utils.ConsoleColors;
 
 public class Machine {
@@ -14,26 +15,46 @@ public class Machine {
 	private List<State> states; // all of all the machine's states
 	private boolean isRunning = false; // indicates if the machine is running
 
+	/**
+	 * The method construct a new machine. The machine is yet not running (use
+	 * {@link #start()} and {@link #stop()} methods) .
+	 * 
+	 * @param states
+	 * @param startStateIndex
+	 */
 	public Machine(List<State> states, int startStateIndex) {
 		Machine.validateMachineInput(states, startStateIndex);
 		this.states = states;
 		this.currentState = states.get(startStateIndex);
 		System.out.println(this);
 		this.printCurrentState();
+	}
+
+	public void start() {
 		this.isRunning = true;
 	}
 
-	public void process(Object event) {
-		int index = this.currentState.calculate(event);
-		try {
-			Class<? extends State> nextStateClass = this.currentState.getAllPossibleCalculations().get(index);
-			this.updateState(nextStateClass);
-		} catch (Exception e) { // if (index < 0) or (index > currentState.getAllPossibleCalculations().size())
-			System.out.println(e.getMessage());
-			System.out.println();
-		} finally {
-			this.printCurrentState();
+	public void stop() {
+		this.isRunning = false;
+	}
+
+	public MachineProcessResponse process(Object event) {
+		MachineProcessResponse.Status status = Status.OK;
+		String message = null;
+		if (this.isRunning) { // if the machine is running we should process the event
+			int index = this.currentState.calculate(event);
+			try {
+				Class<? extends State> nextStateClass = this.currentState.getAllPossibleCalculations().get(index);
+				this.updateState(nextStateClass);
+			} catch (Exception e) { // if (index < 0) or (index > currentState.getAllPossibleCalculations().size())
+				message = e.getMessage();
+			}
 		}
+		else { // if the machine is not running
+			status = Status.ERROR;
+			message = "ERROR - the machine is in STOP mode.";
+		}
+		return new MachineProcessResponse(status, message);
 	}
 
 	private void updateState(Class<? extends State> nextStateClass) {
