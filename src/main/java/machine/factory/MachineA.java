@@ -1,6 +1,10 @@
 package machine.factory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import machine.models.Event;
 import machine.models.Machine;
@@ -11,23 +15,46 @@ import machine.models.Status;
 class MachineA implements Machine {
 
 	private State currentState;
-	private List<State> states; // all of all the machine's states
+	private Set<Class<? extends State>> statesClasses; // all the machine's states classes
 	private boolean isRunning = false; // indicates if the machine is running
 
 	/**
 	 * The method construct a new machine. The machine is not yet running (use
 	 * {@link #start()} and {@link #stop()} methods) .
 	 * 
-	 * @param states
-	 * @param startStateIndex
+	 * @param statesClasses
+	 * @param entryStateClass
 	 */
-	public MachineA(List<State> states, int startStateIndex) {
-		MachineA.validateMachineInput(states, startStateIndex);
-		this.states = states;
-		this.currentState = states.get(startStateIndex);
-		System.out.println(this);
+	public MachineA(Set<Class<? extends State>> statesClasses, Class<? extends State> entryStateClass) {
+		this.validateMachineInput(statesClasses, entryStateClass);
+		this.statesClasses = statesClasses;
+		this.currentState = this.getStateByClass(entryStateClass);
 	}
-
+	
+	/*
+	 * The method helps the machine constructor validate its input
+	 */
+	private void validateMachineInput(Set<Class<? extends State>> statesClasses, Class<? extends State> entryStateClass) {
+		if (statesClasses == null || statesClasses.size() == 0) {
+			throw new RuntimeException("ERROR - There must be at least one state in the machine.");
+		}
+		if (entryStateClass == null) {
+			throw new RuntimeException("ERROR - The entryState class should be a legal state class.");
+		}
+		boolean statesContainsEntryState = false;
+		for(Class<? extends State> clazz : statesClasses) {
+			if(clazz.equals(entryStateClass)) {
+				statesContainsEntryState = true;
+			}
+		}
+		if(!statesContainsEntryState) {
+			throw new RuntimeException("ERROR - statesClasses should contain the entryStateClass.");
+		}
+		// TODO insert validation that i have in memory all the possible states
+		// TODO insert validation that there all the states done have themselves in the
+		// possible states list
+	}
+	
 	@Override
 	public void start() {
 		this.isRunning = true;
@@ -53,16 +80,8 @@ class MachineA implements Machine {
 		Status status = Status.OK;
 		String message = null;
 		if (this.isRunning) { // if the machine is running we should process the event
-			int index = this.currentState.calculate(event);
-			if (index != Integer.MAX_VALUE) { // if the machine change its state
-				try {
-					Class<? extends State> nextStateClass = this.currentState.getAllPossibleCalculations().get(index);
-					this.updateState(nextStateClass);
-				} catch (Exception e) { // if (index < 0) or (index > currentState.getAllPossibleCalculations().size())
-					// TODO implement what the machine should do in such case
-					message = e.getMessage();
-				}
-			}
+			Class<? extends State> nextStateClass = this.currentState.calculate(event);
+			this.updateState(nextStateClass);
 		} else { // if the machine is not running
 			status = Status.ERROR;
 			message = "ERROR - the machine is in STOP mode.";
@@ -70,62 +89,27 @@ class MachineA implements Machine {
 		return new MachineProcessResponse(status, message, this.currentState);
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder stringBuilder = new StringBuilder();
-		for (int i = 0; i < this.states.size(); i++) {
-			String stateString = this.states.get(i).getClass().getSimpleName();
-			String possibleStates = String.format(" -> [%s]\n", getpossibleStatesString(this.states.get(i)));
-			stringBuilder.append(stateString).append(possibleStates);
-		}
-		return stringBuilder.toString();
-	}
 
 	private void updateState(Class<? extends State> nextStateClass) {
 		if (!nextStateClass.equals(this.currentState.getClass())) {
-//			this.currentColor = ConsoleColors.getRandomColor(this.currentColor);
 			this.currentState = this.getStateByClass(nextStateClass);
 		}
 	}
 
 	private State getStateByClass(Class<? extends State> stateClass) {
-		for (State state : this.states) {
-			if (state.getClass().equals(stateClass)) {
-				return state;
-			}
+		State state = null;
+		try {
+			Constructor<? extends State> constructor = stateClass.getConstructor();
+			state = constructor.newInstance(new Object[] {});
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		String errorString = String.format(
-				"ERROR - %s's calculation method returned a class which was not included at the getAllPossibleCalculations",
-				stateClass.toString());
-		throw new RuntimeException(errorString);
+		return state;
+		
 	}
 
-	// static methods
 
-	/**
-	 * Static method which receives State and generates a string of all the
-	 * accessible states for the machine by one event.
-	 * 
-	 * @param state
-	 * @return
-	 */
-	private static String getpossibleStatesString(State state) {
-		return String.join(", ", state.getAllPossibleCalculations().stream().map(Class::getSimpleName).toList());
-	}
-
-	/*
-	 * Static method which helps the machine constructor validate its input
-	 */
-	private static void validateMachineInput(List<State> states, int startStateIndex) {
-		if (states == null || states.size() == 0) {
-			throw new RuntimeException("ERROR - There must be at least one state in the machine.");
-		}
-		if (startStateIndex < 0 || startStateIndex > states.size() - 1) {
-			throw new RuntimeException("ERROR - There must be at least one state in the machine.");
-		}
-		// TODO insert validation that i have in memory all the possible states
-		// TODO insert validation that there all the states done have themselves in the
-		// possible states list
-	}
 
 }
