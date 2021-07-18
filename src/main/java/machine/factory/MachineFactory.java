@@ -1,8 +1,6 @@
 package machine.factory;
 
-import java.util.List;
 import java.util.Set;
-
 import machine.models.Machine;
 import machine.models.State;
 
