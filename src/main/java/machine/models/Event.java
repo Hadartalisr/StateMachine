@@ -30,6 +30,5 @@ public class Event<T>{
 	public T getEventData() {
 		return eventData;
 	}
-	
 
 }
