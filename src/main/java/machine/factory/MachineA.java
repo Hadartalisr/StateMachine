@@ -1,17 +1,9 @@
 package machine.factory;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import machine.models.Event;
@@ -21,11 +13,15 @@ import machine.models.State;
 import machine.models.Status;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.google.gson.Gson;
+
 class MachineA implements Machine {
 
 	private State currentState;
 	private Set<Class<? extends State>> statesClasses; // all the machine's states classes
 	private boolean isRunning = false; // indicates if the machine is running
+	private String lastEvent;
+	private final String maintenanceConfigLocation = "C:\\Dev\\StateMachineImplementation\\state.json";
 
 	/**
 	 * The method construct a new machine. The machine is not yet running (use
@@ -68,21 +64,37 @@ class MachineA implements Machine {
 
 	@Override
 	public void stop() {
-	    ObjectMapper mapper = new ObjectMapper();
-	    try {  
-
-	        // Writing to a file   
-	        mapper.writeValue(new File("C:\\Dev\\StateMachineImplementation\\state.json"), this.currentState );
-
-	    } catch (IOException e) {  
-	        e.printStackTrace();  
-	    }  
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			MaintenanceData maintenanceData = new MaintenanceData(this.currentState.getClass().getName(),
+					this.lastEvent);
+			mapper.writeValue(new File(maintenanceConfigLocation), maintenanceData);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		this.isRunning = false;
 	}
 
 	@Override
 	public void startAfterMaintenance() {
-
+		//TODO throw exception if the machine is already running
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			File file = new File(this.maintenanceConfigLocation);
+			MaintenanceData maintenanceData = mapper.readValue(file, MaintenanceData.class);
+			//TODO add try catch
+			@SuppressWarnings("unchecked")
+			Class<? extends State> stateClass = (Class<? extends State>) Class.forName(maintenanceData.stateClassName);
+			this.currentState = this.getStateByClass(stateClass);
+			this.lastEvent = maintenanceData.lastEvent;
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.isRunning = true;
 	}
 
 	@Override
@@ -102,6 +114,7 @@ class MachineA implements Machine {
 
 	@Override
 	public MachineProcessResponse process(Event<?> event) {
+		this.updateLastEvent(event);
 		Status status = Status.OK;
 		String message = null;
 		if (this.isRunning) { // if the machine is running we should process the event
@@ -118,6 +131,10 @@ class MachineA implements Machine {
 		if (this.currentState == null || !nextStateClass.equals(this.currentState.getClass())) {
 			this.currentState = this.getStateByClass(nextStateClass);
 		}
+	}
+
+	private void updateLastEvent(Event<?> event) {
+		this.lastEvent = new Gson().toJson(event.getEventData());
 	}
 
 	private State getStateByClass(Class<? extends State> stateClass) { // TODO add data to object initialization

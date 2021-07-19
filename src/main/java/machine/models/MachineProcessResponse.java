@@ -2,11 +2,9 @@ package machine.models;
 
 public class MachineProcessResponse {
 
-	public Status status;
-
-	public String message;
-
-	public State currentState;
+	private Status status;
+	private String message;
+	private State currentState;
 
 	public MachineProcessResponse(Status status, String message, State currentState) {
 		this.status = status;
