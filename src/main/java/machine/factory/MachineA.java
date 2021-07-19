@@ -21,7 +21,8 @@ class MachineA implements Machine {
 	private Set<Class<? extends State>> statesClasses; // all the machine's states classes
 	private boolean isRunning = false; // indicates if the machine is running
 	private String lastEvent;
-	private final String maintenanceConfigLocation = "C:\\Dev\\StateMachineImplementation\\state.json";
+	private static final String maintenanceConfigLocation = "C:\\Dev\\StateMachineImplementation\\state.json";
+	//TODO change the location to support multiple OS
 
 	/**
 	 * The method construct a new machine. The machine is not yet running (use
@@ -39,7 +40,7 @@ class MachineA implements Machine {
 	 * The method helps the machine constructor validate its input
 	 */
 	private void validateMachineInput(Set<Class<? extends State>> statesClasses) {
-		if (statesClasses == null || statesClasses.size() == 0) {
+		if (statesClasses == null || statesClasses.isEmpty()) {
 			throw new RuntimeException("ERROR - There must be at least one state in the machine.");
 		}
 	}
